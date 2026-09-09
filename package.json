@@ -18,7 +18,9 @@
     "build:admin": "vite build admin-app --config admin-app/vite.config.js",
     "build:lhk": "vite build lhk-admin-app --config lhk-admin-app/vite.config.js",
     "build:clg": "vite build clg-admin-app --config clg-admin-app/vite.config.js",
-    "build:rider": "vite build rider-app --config rider-app/vite.config.js"
+    "build:rider": "vite build rider-app --config rider-app/vite.config.js",
+    "render:build": "npm run build:all",
+    "render:start": "node server/server.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

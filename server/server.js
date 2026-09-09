@@ -17,20 +17,32 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-// Database file path for offline cache
-const DATA_DIR = path.resolve(__dirname, 'data');
+// Database file path for offline cache (uses /tmp on Vercel to prevent read-only filesystem errors)
+const isVercel = Boolean(process.env.VERCEL);
+const DATA_DIR = isVercel ? '/tmp/campusbites_data' : path.resolve(__dirname, 'data');
 const DB_FILE = path.resolve(DATA_DIR, 'orders_db.json');
-const UPLOADS_DIR = path.resolve(__dirname, 'uploads');
+const UPLOADS_DIR = isVercel ? '/tmp/campusbites_uploads' : path.resolve(__dirname, 'uploads');
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch (dirErr) {
+  console.warn('[Storage] Notice on directory initialization:', dirErr.message);
 }
 
 // Serve uploaded images statically
 app.use('/uploads', express.static(UPLOADS_DIR));
+
+// Distribution paths for built production frontends
+const studentDist = path.resolve(__dirname, '../student-app/dist');
+const adminDist = path.resolve(__dirname, '../admin-app/dist');
+const lhkDist = path.resolve(__dirname, '../lhk-admin-app/dist');
+const clgDist = path.resolve(__dirname, '../clg-admin-app/dist');
+const riderDist = path.resolve(__dirname, '../rider-app/dist');
 
 // ----------------------------------------------------
 // GMAIL OTP TRANSPORTER SETUP
@@ -372,11 +384,17 @@ function writeLocalDb(data) {
 // ----------------------------------------------------
 
 // GET / (Visual Dashboard) & /api/health & /api/db/status
-app.get(['/', '/api', '/api/health', '/api/db/status'], async (req, res) => {
+// GET / (Student App or Hub) & /status & /api/health & /api/db/status
+app.get(['/', '/status', '/api', '/api/health', '/api/db/status'], async (req, res) => {
   let neonStatus = 'offline';
   let totalNeonOrders = 0;
   let totalNeonStudents = 0;
   let currentDb = 'clgbytes';
+
+  // If studentDist exists and root '/' is requested by browser, serve Student Dining App
+  if (req.path === '/' && fs.existsSync(studentDist) && req.accepts('html')) {
+    return res.sendFile(path.join(studentDist, 'index.html'));
+  }
 
   if (sql) {
     try {
@@ -392,8 +410,8 @@ app.get(['/', '/api', '/api/health', '/api/db/status'], async (req, res) => {
     }
   }
 
-  // If browser requests HTML at root '/', serve a sleek dashboard
-  if (req.path === '/' && req.accepts('html')) {
+  // If browser requests HTML at '/status' or fallback, serve Central Backend Hub
+  if ((req.path === '/' || req.path === '/status') && req.accepts('html')) {
     return res.send(`
       <!DOCTYPE html>
       <html lang="en">
@@ -2364,31 +2382,25 @@ app.delete('/api/menu/:id', async (req, res) => {
 });
 
 // Serve built production frontends if dist folders exist (Unified Full-Stack Deployment)
-const studentDist = path.resolve(__dirname, '../student-app/dist');
-const adminDist = path.resolve(__dirname, '../admin-app/dist');
-const lhkDist = path.resolve(__dirname, '../lhk-admin-app/dist');
-const clgDist = path.resolve(__dirname, '../clg-admin-app/dist');
-const riderDist = path.resolve(__dirname, '../rider-app/dist');
-
 if (fs.existsSync(adminDist)) {
   app.use('/admin', express.static(adminDist));
-  app.get(['/admin', '/admin/*'], (req, res) => res.sendFile(path.join(adminDist, 'index.html')));
+  app.use('/admin', (req, res) => res.sendFile(path.join(adminDist, 'index.html')));
 }
 if (fs.existsSync(lhkDist)) {
   app.use('/lhk', express.static(lhkDist));
-  app.get(['/lhk', '/lhk/*'], (req, res) => res.sendFile(path.join(lhkDist, 'index.html')));
+  app.use('/lhk', (req, res) => res.sendFile(path.join(lhkDist, 'index.html')));
 }
 if (fs.existsSync(clgDist)) {
   app.use('/clg', express.static(clgDist));
-  app.get(['/clg', '/clg/*'], (req, res) => res.sendFile(path.join(clgDist, 'index.html')));
+  app.use('/clg', (req, res) => res.sendFile(path.join(clgDist, 'index.html')));
 }
 if (fs.existsSync(riderDist)) {
   app.use('/rider', express.static(riderDist));
-  app.get(['/rider', '/rider/*'], (req, res) => res.sendFile(path.join(riderDist, 'index.html')));
+  app.use('/rider', (req, res) => res.sendFile(path.join(riderDist, 'index.html')));
 }
 if (fs.existsSync(studentDist)) {
   app.use(express.static(studentDist));
-  app.get('*', (req, res) => {
+  app.use((req, res) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Endpoint not found' });
     res.sendFile(path.join(studentDist, 'index.html'));
   });
