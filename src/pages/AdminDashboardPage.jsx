@@ -799,25 +799,27 @@ export default function AdminDashboardPage() {
         />
 
         {/* 4. Real-time Student Orders Table */}
-        <OrdersTable
-          orders={orders}
-          activeRestaurantTab={effectiveTab}
-          isRestaurantAdmin={isRestaurantAdmin}
-          onSelectRestaurantTab={isRestaurantAdmin ? undefined : (tab) => {
-            setActiveRestaurantTab(tab);
-          }}
-          restaurantName={
-            effectiveTab === 'local-home-kitchen'
-              ? 'Local Home Kitchen'
-              : effectiveTab === 'clg-bites-biryani-nation'
-              ? 'CLG Bites Biryani Nation'
-              : 'All Restaurants'
-          }
-          onInspectOrder={(order) => setInspectingOrder(order)}
-          onUpdateStatus={handleUpdateStatus}
-          onCancelOrder={handleCancelOrder}
-          onPromptDeleteOrder={(order) => setOrderToDelete(order)}
-        />
+        <ErrorBoundary>
+          <OrdersTable
+            orders={orders}
+            activeRestaurantTab={effectiveTab}
+            isRestaurantAdmin={isRestaurantAdmin}
+            onSelectRestaurantTab={isRestaurantAdmin ? undefined : (tab) => {
+              setActiveRestaurantTab(tab);
+            }}
+            restaurantName={
+              effectiveTab === 'local-home-kitchen'
+                ? 'Local Home Kitchen'
+                : effectiveTab === 'clg-bites-biryani-nation'
+                ? 'CLG Bites Biryani Nation'
+                : 'All Restaurants'
+            }
+            onInspectOrder={(order) => setInspectingOrder(order)}
+            onUpdateStatus={handleUpdateStatus}
+            onCancelOrder={handleCancelOrder}
+            onPromptDeleteOrder={(order) => setOrderToDelete(order)}
+          />
+        </ErrorBoundary>
 
       </main>
 
