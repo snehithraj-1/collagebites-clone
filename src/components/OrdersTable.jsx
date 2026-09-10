@@ -76,6 +76,13 @@ export default function OrdersTable({
     );
   });
 
+  const handleQuickExport = () => {
+    exportOrdersToExcel(filteredOrders, {
+      timeframe: 'ALL',
+      restaurantName
+    });
+  };
+
   const handleTriggerExport = () => {
     exportOrdersToExcel(filteredOrders, {
       timeframe: exportTimeframe,
@@ -179,15 +186,24 @@ export default function OrdersTable({
             <option value="CANCELLED">CANCELLED</option>
           </select>
 
-          {/* Export to Excel Button */}
-          <button
-            onClick={() => setShowExportModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer border-none"
-            title="Export filtered orders to Excel (.csv format)"
-          >
-            <Download size={13} />
-            <span>EXPORT TO EXCEL</span>
-          </button>
+          {/* 1-Click Instant Export to Excel */}
+          <div className="inline-flex items-center rounded-xl bg-emerald-600 shadow-xs overflow-hidden">
+            <button
+              onClick={handleQuickExport}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors cursor-pointer border-none"
+              title="Instantly download Excel spreadsheet for all currently visible orders"
+            >
+              <Download size={13} />
+              <span>EXPORT TO EXCEL</span>
+            </button>
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="px-2 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs transition-colors cursor-pointer border-none border-l border-emerald-500/40"
+              title="Custom Date Filter & Timeframe Export Options"
+            >
+              <Calendar size={13} />
+            </button>
+          </div>
         </div>
 
       </div>
