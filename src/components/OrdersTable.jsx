@@ -175,7 +175,6 @@ export default function OrdersTable({
           >
             <option value="ALL">All Statuses</option>
             <option value="CONFIRMED">CONFIRMED</option>
-            <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY</option>
             <option value="DELIVERED">DELIVERED</option>
             <option value="CANCELLED">CANCELLED</option>
           </select>
@@ -308,19 +307,8 @@ export default function OrdersTable({
 
                         {onUpdateStatus && order.status === 'CONFIRMED' && (
                           <button
-                            onClick={() => onUpdateStatus(order.id, 'OUT_FOR_DELIVERY')}
-                            className="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer border-none shadow-xs"
-                            title="Mark Out for Delivery"
-                          >
-                            <Bike size={11} />
-                            <span>Dispatch</span>
-                          </button>
-                        )}
-
-                        {onUpdateStatus && order.status === 'OUT_FOR_DELIVERY' && (
-                          <button
                             onClick={() => onUpdateStatus(order.id, 'DELIVERED')}
-                            className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer border-none shadow-xs"
+                            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer border-none shadow-xs"
                             title="Mark Order as Delivered"
                           >
                             <CheckCircle2 size={11} />
@@ -449,22 +437,19 @@ export default function OrdersTable({
 
                   {onUpdateStatus && order.status === 'CONFIRMED' && (
                     <button
-                      onClick={() => onUpdateStatus(order.id, 'OUT_FOR_DELIVERY')}
-                      className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 cursor-pointer border-none shadow-xs"
-                    >
-                      <Bike size={12} />
-                      <span>Dispatch</span>
-                    </button>
-                  )}
-
-                  {onUpdateStatus && order.status === 'OUT_FOR_DELIVERY' && (
-                    <button
                       onClick={() => onUpdateStatus(order.id, 'DELIVERED')}
                       className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 cursor-pointer border-none shadow-xs"
                     >
                       <CheckCircle2 size={12} />
                       <span>Deliver</span>
                     </button>
+                  )}
+
+                  {order.status === 'DELIVERED' && (
+                    <span className="px-2.5 py-1 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-400 font-bold text-xs flex items-center gap-1">
+                      <CheckCircle2 size={12} />
+                      <span>Delivered</span>
+                    </span>
                   )}
 
                   {order.status !== 'CANCELLED' && onCancelOrder && (

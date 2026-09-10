@@ -381,42 +381,34 @@ export default function OrderDetailsModal({
             </div>
           </div>
 
-          {/* Quick Status Override Buttons */}
+          {/* Quick Status Override Buttons - Only CONFIRMED and DELIVERED */}
           {onUpdateStatus && (
             <div className="space-y-1.5 pt-1 print:hidden">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Update Order Status
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => onUpdateStatus(order.id, 'CONFIRMED')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
                     order.status === 'CONFIRMED'
                       ? 'bg-amber-500/30 text-amber-300 border-amber-500 shadow-xs'
                       : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400 border-slate-700'
                   }`}
                 >
-                  CONFIRMED
-                </button>
-                <button
-                  onClick={() => onUpdateStatus(order.id, 'OUT_FOR_DELIVERY')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                    order.status === 'OUT_FOR_DELIVERY'
-                      ? 'bg-blue-500/30 text-blue-300 border-blue-500 shadow-xs'
-                      : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400 border-slate-700'
-                  }`}
-                >
-                  OUT FOR DELIVERY
+                  <Clock size={13} />
+                  <span>CONFIRMED</span>
                 </button>
                 <button
                   onClick={() => onUpdateStatus(order.id, 'DELIVERED')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center justify-center gap-1.5 ${
                     order.status === 'DELIVERED'
                       ? 'bg-emerald-500/30 text-emerald-300 border-emerald-500 shadow-xs'
                       : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400 border-slate-700'
                   }`}
                 >
-                  DELIVERED
+                  <CheckCircle2 size={13} />
+                  <span>DELIVERED</span>
                 </button>
               </div>
             </div>
